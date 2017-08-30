@@ -1,0 +1,99 @@
+
+version: '2.1'
+
+services:
+
+    source-service:
+        container_name: source-service
+        build: ./source-api/
+        volumes:
+            - './source-api:/var/www/html/app'
+        ports:
+            - '8000:80' # expose ports - HOST:CONTAINER
+        depends_on:
+            source-db:
+                condition: service_healthy
+        links:
+            - source-db:postgresdb
+
+    destination-service:
+        container_name: destination-service
+        build: ./destination-api/
+        volumes:
+            - './source-api:/var/www/html/app'
+        ports:
+            - '8001:80' # expose ports - HOST:CONTAINER
+        depends_on:
+            destination-db:
+                condition: service_healthy
+        links:
+            - destination-db:postgresdb
+    
+    php:
+        build: php7-fpm
+        volumes:
+            - ./symfony:/var/www/symfony
+            - ./logs/symfony:/var/www/symfony/app/logs
+    nginx:
+        build: nginx
+        ports:
+            - 8002:80
+        volumes_from:
+            - php
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+        links:
+            - db
+        depends_on:
+            source-service:
+                condition: service_started
+            destination-service:
+                condition: service_started
+        links:
+            - destination-service
+            - source-service
+            
+    source-db:
+        container_name: source-db
+        build: ./source-api/db
+        ports:
+            - '5433:5432' # expose ports - HOST:CONTAINER
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - ./source-api/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+        healthcheck:
+            test: exit 0
+
+    destination-db:
+        container_name: destination-db
+        build: ./destination-api/db
+        ports:
+            - '5434:5432' # expose ports - HOST:CONTAINER
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - ./destination-api/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+        healthcheck:
+            test: exit 0
+
+#  web-service:
+#    container_name: web-service
+#    build: ./services/web/
+#    volumes:
+#      - './services/web:/usr/src/app'
+#      - '/usr/src/app/node_modules'
+#    ports:
+#      - '3007:3006' # expose ports - HOST:CONTAINER
+#    environment:
+#      - NODE_ENV=${NODE_ENV}
+#    depends_on:
+#      source-service:
+#        condition: service_started
+#      destination-service:
+#        condition: service_started
+#    links:
+#      - source-service
+#      - destination-service
