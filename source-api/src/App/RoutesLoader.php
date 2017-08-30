@@ -32,6 +32,7 @@ class RoutesLoader
         $api->post('/courses', "courses.controller:save");
         $api->put('/courses/{id}', "courses.controller:update");
         $api->delete('/courses/{id}', "courses.controller:delete");
+        $api->get('/courses/page/{page}', "courses.controller:getPaginated");
 
         $this->app->mount('/', $api);
     }

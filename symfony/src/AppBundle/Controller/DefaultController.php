@@ -17,7 +17,6 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $courseList = $this->getSourceCourseListContent('/courses');
         return new Response("symfony");
     }
     
@@ -25,7 +24,7 @@ class DefaultController extends Controller
     {
         $sourceClient = new Client([
             // Base URI is used with relative requests
-            'base_uri' => 'source-service',
+            'base_uri' => 'http://source-service/',
             // You can set any number of default request options.
             'timeout' => 2.0,
         ]);
@@ -80,7 +79,12 @@ class DefaultController extends Controller
     }
     
     private function postToDestinationApi($schoolId, $destinationCourses) {
-        $destinationClient = new Client();
+        $destinationClient = new Client([
+            // Base URI is used with relative requests
+            'base_uri' => 'http://destination-service/',
+            // You can set any number of default request options.
+            'timeout' => 2.0,
+        ]);
         $destinationClient->post('/school/{schoolId}/courses', [
             'schoolId' => $schoolId,
             'json' => [

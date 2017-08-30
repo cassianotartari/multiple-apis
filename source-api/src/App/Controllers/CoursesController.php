@@ -9,7 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 class CoursesController
 {
 
+    /**
+     *
+     * @var \App\Services\CoursesService
+     */
     protected $coursesService;
+    
+    protected $pageSize = 3;
 
     public function __construct($service)
     {
@@ -21,6 +27,17 @@ class CoursesController
         return new JsonResponse('source-api');
     }
     
+    public function getPaginated($page) {
+        $page = $page < 0 ? 0 : $page;
+        $prev = "http://source-api/courses/".$page;
+        $next = "http://source-api/courses/".($page+1);
+        return new JsonResponse([
+            'prev' => $prev,
+            'next' => $next,
+            'data' => $this->coursesService->getPaginated($this->pageSize, $page)
+        ]);
+    }
+
     public function getOne($id)
     {
         return new JsonResponse($this->coursesService->getOne($id));

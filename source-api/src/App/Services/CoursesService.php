@@ -4,6 +4,8 @@ namespace App\Services;
 
 class CoursesService extends BaseService
 {
+    
+    private $queryBuilder;
 
     public function getOne($id)
     {
@@ -13,6 +15,19 @@ class CoursesService extends BaseService
     public function getAll()
     {
         return $this->db->fetchAll("SELECT * FROM courses");
+    }
+    
+    public function getPaginated(int $limit, int $offset)
+    {
+        $this->queryBuilder = $this->db->createQueryBuilder();
+        $result = $this->queryBuilder
+            ->select('c.id')
+            ->from('courses', 'c')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->execute();
+        return $result->fetchAll();
+//        return $this->db->executeQuery("SELECT id FROM courses WHERE ORDER BY id LIMIT ? OFFSET ?", [$limit, $offset]);
     }
 
     function save($note)

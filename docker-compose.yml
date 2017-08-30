@@ -34,6 +34,9 @@ services:
         volumes:
             - ./symfony:/var/www/symfony
             - ./logs/symfony:/var/www/symfony/app/logs
+        links:
+            - destination-service
+            - source-service
     nginx:
         build: nginx
         ports:
@@ -42,8 +45,6 @@ services:
             - php
         volumes:
             - ./logs/nginx/:/var/log/nginx
-        links:
-            - db
         depends_on:
             source-service:
                 condition: service_started
