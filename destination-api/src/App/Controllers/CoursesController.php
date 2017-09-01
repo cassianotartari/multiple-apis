@@ -30,7 +30,6 @@ class CoursesController
         $courses = $this->getDataFromRequest($request);
         $ids = [];
         foreach ($courses as $course) {
-            var_dump($this->coursesService->save($course));die();
             $ids[] = $this->coursesService->save($course);
         }
         if(count($ids)) {

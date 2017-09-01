@@ -69,7 +69,7 @@ class DefaultController extends Controller
         do {
             foreach ($courseList['data'] as $courseId)
             {
-                $course = $this->getSourceCourseContent((int) $courseId);
+                $course = $this->getSourceCourseContent(array_shift($courseId));
                 
                 $sourceApiXCourse = new SourceApiXCourse(
                     (string) $course['id'],
