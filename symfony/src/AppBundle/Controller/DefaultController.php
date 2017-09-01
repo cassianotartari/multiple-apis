@@ -17,17 +17,23 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return new Response("symfony");
+        return $this->copyApi();
+//        return new Response("symfony");
+    }
+    
+    private function getSourceClient()
+    {
+        return new Client([
+            // Base URI is used with relative requests
+            'base_uri' => 'http://source-service',
+            // You can set any number of default request options.
+            'timeout' => 2.0,
+        ]);
     }
     
     private function getSourceCourseListContent($url)
     {
-        $sourceClient = new Client([
-            // Base URI is used with relative requests
-            'base_uri' => 'http://source-service/',
-            // You can set any number of default request options.
-            'timeout' => 2.0,
-        ]);
+        $sourceClient = $this->getSourceClient();
 
         $courseListResponse = $sourceClient->get($url);
 
@@ -38,17 +44,18 @@ class DefaultController extends Controller
         return json_decode($couseListBodyContent, true);
     }
     
-    private function getSourceCourseContent($id) {
-        
-        $sourceClient = new Client();
-        
-        $courseResponse = $sourceClient->get('/courses/{id}', [
-            'id' => $id
-        ]);
+    private function getCourse($id)
+    {
+        return $this->getSourceClient()->get('/courses/'.$id);
+    }
 
-        $courseBodyContent = $courseResponse
-                ->getBody()
-                ->getContents();
+
+    private function getSourceCourseContent($id)
+    {
+
+        $courseBodyContent = $this->getCourse($id)
+            ->getBody()
+            ->getContents();
 
         return json_decode($courseBodyContent, true);
     }
@@ -62,12 +69,12 @@ class DefaultController extends Controller
         do {
             foreach ($courseList['data'] as $courseId)
             {
-                $course = $this->getSourceCourseContent($courseId);
+                $course = $this->getSourceCourseContent((int) $courseId);
                 
                 $sourceApiXCourse = new SourceApiXCourse(
-                    $course['id'],
-                    $course['name'],
-                    $course['grade']
+                    (string) $course['id'],
+                    (string) $course['name'],
+                    (string) $course['grade']
                 );
                 $sourceApi->addCourse($sourceApiXCourse);
             }
@@ -75,7 +82,8 @@ class DefaultController extends Controller
         } while ($courseList['next'] !== '');
         
         $destinationCourses = $sourceApi->getDestinationCourses();
-        $this->postToDestinationApi(1, $destinationCourses);
+        var_dump($destinationCourses);
+//        $this->postToDestinationApi(1, $destinationCourses);
     }
     
     private function postToDestinationApi($schoolId, $destinationCourses) {

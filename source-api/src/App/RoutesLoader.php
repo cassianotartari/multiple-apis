@@ -27,7 +27,8 @@ class RoutesLoader
         $api = $this->app["controllers_factory"];
 
         $api->get('/', "courses.controller:index");
-        $api->get('/courses', "courses.controller:getAll");
+//        $api->get('/courses', "courses.controller:getAll");
+        $api->get('/courses', "courses.controller:getFirstPage");
         $api->get('/courses/{id}', "courses.controller:getOne");
         $api->post('/courses', "courses.controller:save");
         $api->put('/courses/{id}', "courses.controller:update");

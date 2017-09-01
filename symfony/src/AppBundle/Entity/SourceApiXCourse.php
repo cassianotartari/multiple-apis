@@ -73,7 +73,7 @@ class SourceApiXCourse implements SourceApiCourseInterface
     }
     
     public function getGradeNumber() {
-        GradeLevel::getGradeLevelNumber($this->grade);
+        return GradeLevel::getGradeLevelNumber($this->grade);
     }
 
     public function castToDestinationCourse(): DestinationCourse

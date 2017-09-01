@@ -27,15 +27,27 @@ class CoursesController
         return new JsonResponse('source-api');
     }
     
-    public function getPaginated($page) {
-        $page = $page < 0 ? 0 : $page;
-        $prev = "http://source-api/courses/".$page;
-        $next = "http://source-api/courses/".($page+1);
+    public function getPaginated(int $page = 0)
+    {
+        $offset = $page < 0 ? 0 : $page*$this->pageSize;
+        $data = $this->coursesService->getPaginated($this->pageSize, $offset);
+        $prev = ($page > 0)?"/courses/page/".($page-1):"";
+        $next = "/courses/page/".($page+1);
+        
+        if(!count($data)) {
+            $prev = $next = "";
+        }
+        
         return new JsonResponse([
             'prev' => $prev,
             'next' => $next,
-            'data' => $this->coursesService->getPaginated($this->pageSize, $page)
+            'data' => $this->coursesService->getPaginated($this->pageSize, $offset)
         ]);
+    }
+    
+    public function getFirstPage()
+    {
+        return $this->getPaginated();
     }
 
     public function getOne($id)
