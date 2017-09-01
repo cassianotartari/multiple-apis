@@ -27,6 +27,8 @@ class RoutesLoader
         $api = $this->app["controllers_factory"];
 
         $api->post('/courses', "courses.controller:save");
+        $api->get('/', "courses.controller:index");
+        $api->get('/courses', "courses.controller:getAll");
 
         $this->app->mount('/', $api);
     }

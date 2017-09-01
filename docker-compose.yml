@@ -20,7 +20,7 @@ services:
         container_name: destination-service
         build: ./destination-api/
         volumes:
-            - './source-api:/var/www/html/app'
+            - './destination-api:/var/www/html/app'
         ports:
             - '8001:80' # expose ports - HOST:CONTAINER
         depends_on:

@@ -13,7 +13,7 @@ namespace AppBundle\Entity;
  *
  * @author cassiano
  */
-class DestinationCourse
+class DestinationCourse implements \JsonSerializable
 {
     /**
      * @var string
@@ -64,6 +64,11 @@ class DestinationCourse
         $this->srcid = $srcid;
         
         return $this;
+    }
+    
+    public function jsonSerialize()
+    {
+        return (object) get_object_vars($this);
     }
 
     function __construct($title, $grade, $srcid)

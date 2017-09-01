@@ -27,14 +27,25 @@ class CoursesController
     
     public function save(Request $request)
     {
-        $note = $this->getDataFromRequest($request);
-        return new JsonResponse(array("id" => $this->coursesService->save($note)));
+        $courses = $this->getDataFromRequest($request);
+        $ids = [];
+        foreach ($courses as $course) {
+            var_dump($this->coursesService->save($course));die();
+            $ids[] = $this->coursesService->save($course);
+        }
+        if(count($ids)) {
+            return new JsonResponse($ids, Response::HTTP_CREATED);
+        }
+        return  new JsonResponse("", Response::HTTP_BAD_REQUEST);
     }
 
     public function getDataFromRequest(Request $request)
     {
-        return $note = array(
-            "course" => $request->request->get("course")
-        );
+        return $request->request->get("courses");
+    }
+    
+    public function getAll()
+    {
+        return new JsonResponse($this->coursesService->getAll());
     }
 }

@@ -82,19 +82,17 @@ class DefaultController extends Controller
         } while ($courseList['next'] !== '');
         
         $destinationCourses = $sourceApi->getDestinationCourses();
-        var_dump($destinationCourses);
-//        $this->postToDestinationApi(1, $destinationCourses);
+        return new Response($this->postToDestinationApi($destinationCourses)->getBody()->getContents());
     }
     
-    private function postToDestinationApi($schoolId, $destinationCourses) {
+    private function postToDestinationApi($destinationCourses) {
         $destinationClient = new Client([
             // Base URI is used with relative requests
-            'base_uri' => 'http://destination-service/',
+            'base_uri' => 'http://destination-service',
             // You can set any number of default request options.
             'timeout' => 2.0,
         ]);
-        $destinationClient->post('/school/{schoolId}/courses', [
-            'schoolId' => $schoolId,
+        return $destinationClient->post('/courses', [
             'json' => [
                 'courses' => $destinationCourses
             ]
